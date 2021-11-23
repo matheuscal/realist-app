@@ -1,0 +1,41 @@
+{
+  "name": "react-boilerplate",
+  "version": "1.0.0",
+  "description": "A practical ReactJS boilerplate using webpack and React-Router.",
+  "main": "main.js",
+  "scripts": {
+    "start": "webpack serve --mode development",
+    "build": "webpack --mode production",
+    "use-sass": "npm i --save-dev sass-loader sass",
+    "use-redux": "npm i @reduxjs/toolkit"
+  },
+  "keywords": [
+    "reactjs",
+    "boilerplate",
+    "setup",
+    "webpack",
+    "react-router"
+  ],
+  "author": "matheuscal",
+  "license": "MIT",
+  "dependencies": {
+    "@babel/core": "^7.16.0",
+    "@babel/plugin-transform-runtime": "^7.16.4",
+    "@babel/preset-env": "^7.16.4",
+    "@babel/preset-react": "^7.16.0",
+    "@reduxjs/toolkit": "^1.6.2",
+    "babel-loader": "^8.2.3",
+    "html-webpack-plugin": "^5.5.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "webpack": "^5.64.2",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.5.0"
+  },
+  "devDependencies": {
+    "css-loader": "^6.5.1",
+    "sass": "^1.43.4",
+    "sass-loader": "^12.3.0",
+    "style-loader": "^3.3.1"
+  }
+}
