@@ -1,0 +1,53 @@
+@use 'sass:map';
+@use '../utils/colors.scss' as *;
+@use '../utils/helpers.scss';
+
+#appView {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#dashboard {
+    margin-top: 20px;
+    flex: 1 1 auto;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    .list-container {
+        flex: 0 1 auto;
+        max-width: 100vw;
+        padding: 0 30px 15px 30px;
+        overflow-x: auto;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: flex-start;
+        min-height: 200px;
+        @include helpers.style-scrollbar(0.15, 0.5);
+        &::-webkit-scrollbar-button {
+            display: block;
+            height: 2px;
+            width: 10px;
+        }
+        > * {
+            flex-shrink: 0;
+        }
+        &__new-list {
+            @include helpers.style-button;
+        }
+    }
+}
+
+.bg-black {background-color: map.get($colors, "bg-black");}
+.bg-red {background-color: map.get($colors, "bg-red");}
+.bg-green {background-color: map.get($colors, "bg-green");}
+.bg-blue {background-color: map.get($colors, "bg-blue");}
+.bg-purple {background-color: map.get($colors, "bg-purple");}
+
+#bg {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+}

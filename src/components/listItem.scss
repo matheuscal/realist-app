@@ -1,0 +1,149 @@
+@use 'sass:map';
+@use '../utils/colors.scss' as *;
+@use '../utils/helpers.scss';
+
+.card {
+    background-color: map.get($colors, "white");
+    border-radius: 3px;
+    padding: 7px;
+    margin-bottom: 6px;
+    box-shadow: 0px 2px 0px 0px #00000025;
+    cursor: pointer;
+    &:hover {
+        .card-header__remove-btn {
+                display: block;
+        }
+    }
+    .card-content > span, p, b {
+        font-size: helpers.toRem(16);
+        color: map.get($colors, "black");
+        margin: 2px 0;
+    }
+    .card-content--edit-mode {
+        resize: none;
+        width: 100%;
+        @include helpers.style-input;
+        margin-top: 13px;
+        font-size: helpers.toRem(16);
+        padding: 3px 6px 3px 6px;
+    }
+    &--edit-mode {
+        cursor: default;
+        z-index: 10;
+        position: relative;
+        left: auto;
+        top: auto;
+    }
+    &-controls {
+        position: absolute;
+        left: 0%;
+        top: 100%;
+        margin-top: 5px;
+        &__save-card-btn {
+            margin-right: 5px;
+            background-color: #52ac52;
+            box-shadow: 1px 1px 0px 1px #2b462b;
+            @include helpers.style-control-btn;
+            &::after {
+                content: '\f00c';
+            }
+            &:hover {
+                background-color: rgb(91, 190, 91);
+            }
+        }
+        &__remove-card-btn {
+            background-color: #a54d4d;
+            box-shadow: 1px 1px 0px 1px #5e2c2c;
+            @include helpers.style-control-btn;
+            &::after {
+                content: '\f00d';
+            }
+            &:hover {
+                background-color: #bb5656
+            }
+        }
+    }
+}
+.card-topics {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: 6px 0 0;
+    padding: 0;
+    align-items: flex-start;
+    &__item {
+        border-radius: 20px;
+        padding: 0px 13px 1px 13px;
+        margin-right: 5px;
+        font-size: helpers.toRem(10);
+        color: map.get($colors, "white");
+        background-color: rgba(map.get($colors, "gray"), 0.5);
+        &:last-child, &--edit-mode:last-child {
+            margin-right: 0;
+        }
+    }
+    &__add-topic {
+        cursor: pointer;
+        border-radius: 3px;
+        padding: 7px 10px 6px;
+        margin-right: 3px;
+        font-size: helpers.toRem(14);
+        color: map.get($colors, "white");
+        background-color: rgba(map.get($colors, "gray"), 0.5);
+        &:hover {
+            background-color: rgba(lighten(map.get($colors, "gray"), 10), 0.5);
+        }
+        &::after {
+            font-family: "FontAwesome";
+            content: "\f067";
+        }
+    }
+}
+
+%card-header__remove-btn {
+    margin-left: auto;
+    color: map.get($colors, "light-gray");
+    background-color: transparent;
+    cursor: pointer;
+    &:hover {
+        color: map.get($colors, "gray");
+    }
+    &::after {
+        font-family: 'FontAwesome';
+        content: '\f00d';
+        font-size: helpers.toRem(18);
+        padding: 5px 15px;
+    }
+}
+.card-header {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    &__remove-btn {
+        @extend %card-header__remove-btn;
+    }
+    &-id {
+        padding-bottom: 6px;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        &__label, &__label--edit-mode {
+            color:  map.get($colors, "black");
+            font-size: helpers.toRem(12);
+        }
+        &__label--edit-mode {
+            line-height: helpers.toRem(24);
+            padding-right: 3px;
+        }
+        &__value {
+            color:  map.get($colors, "gray");
+            font-size: helpers.toRem(12);
+            &--edit-mode {
+                @include helpers.style-input;
+                font-size: helpers.toRem(12);
+                width: 200px;
+                padding: 3px 3px 3px 6px;
+            }
+        }
+    }
+}

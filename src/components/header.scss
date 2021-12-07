@@ -1,0 +1,93 @@
+@use 'sass:map';
+@use '../utils/helpers.scss';
+@use '../utils/colors.scss' as *;
+
+#bgColorPicker {
+    @include helpers.style-bg-color-picker;
+    margin-right: 30px;
+}
+
+.filter {
+    width: fit-content;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: row;
+    .filter-search {
+        width: fit-content;
+        &__input {
+            padding: 8px 5px 8px 12px;
+            background-color: rgba(map.get($colors, "white"), 0.4);
+            width: 250px;
+            &:hover {
+                background-color: rgba(map.get($colors, "white"), 0.6);
+            }
+            &:focus, &:focus::placeholder {
+                background-color: map.get($colors, "white");
+                color: map.get($colors, "black");
+            }
+            &::placeholder {
+                color: lighten(map.get($colors, "light-gray"), 20);
+            }
+        }
+    }
+    .filter-color {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: flex-end;
+        &__label {
+            font-size: helpers.toRem(14);
+        }
+    }
+}
+%colors__color-square {
+    width: 30px; height: 30px;
+    border: 1px map.get($colors, "white") solid;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-right: 5px;
+    &:last-child{
+        margin-right: 0;
+    } 
+}
+.colors {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    list-style: none;
+    &__red {
+        @extend %colors__color-square;
+        background-color: map.get($colors, "bg-red");
+    }
+    &__green {
+        @extend %colors__color-square;
+        background-color: map.get($colors, "bg-green");
+    }
+    &__blue {
+        @extend %colors__color-square;
+        background-color: map.get($colors, "bg-blue");
+    }
+    &__black {
+        @extend %colors__color-square;
+        background-color: map.get($colors, "bg-black");
+    }
+    &__purple {
+        @extend %colors__color-square;
+        background-color: map.get($colors, "bg-purple");
+    }
+}
+.topics {
+    &__add-topic-btn {
+        margin-left: 5px;
+        @include helpers.style-button;
+    }
+}
+
+#logo {
+    display: block;
+    font-size: helpers.toRem(24);
+    text-align: center;
+    padding-top: helpers.toRem(15);
+    margin-bottom: helpers.toRem(20);
+    transform: translateX(- helpers.toRem(30));
+}
