@@ -20,9 +20,9 @@
         margin: 2px 0;
     }
     .card-content--edit-mode {
+        @include helpers.style-input;
         resize: none;
         width: 100%;
-        @include helpers.style-input;
         margin-top: 13px;
         font-size: helpers.toRem(16);
         padding: 3px 6px 3px 6px;
@@ -138,6 +138,7 @@
         &__value {
             color:  map.get($colors, "gray");
             font-size: helpers.toRem(12);
+            padding-left: 2px;
             &--edit-mode {
                 @include helpers.style-input;
                 font-size: helpers.toRem(12);

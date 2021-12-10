@@ -1,4 +1,6 @@
 import React from 'react';
+import { listAdded, selectLists } from '../reducers/listSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -6,18 +8,26 @@ import List from '../components/List';
 import './app.scss';
 
 export default function App(){
+    const dispatch = useDispatch();
+    const allLists = useSelector(selectLists);
+    
+    function addList(){
+        dispatch(listAdded());
+    }
+    function renderLists(){
+        const listComponents = allLists.map(({id}) => {
+            return <List id={id} key={id} />
+         });
+        return(listComponents || null);
+    }
     return (
         <div id='appView'>
             <div id="bg" className='bg-black'></div>
             <Header />
             <div id="dashboard">
                 <div className="list-container">
-                    <List />
-                    <List />
-                    <List />
-                    <List />
-                    <List />
-                    <button type='button' className="list-container__new-list">Add a new list</button>
+                    {renderLists()}
+                    <button type='button' className="list-container__new-list" onClick={addList}>Add a new list</button>
                 </div>
             </div>
             <Footer />
