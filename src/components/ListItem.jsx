@@ -11,7 +11,7 @@ import './listItem.scss';
 export default function ListItem(props){
     const dispatch = useDispatch();
     // This state is responsible for making the card enter and leave the edit mode.
-    const [editing, setEditing] = useState(true);
+    const [editing, setEditing] = useState(false);
     const [cardId, setCardId] = useState(props.cardId);
     const [content, setContent] = useState(props.content);
 
@@ -40,9 +40,12 @@ export default function ListItem(props){
     }
     function handleDragStart(e){
         e.currentTarget.classList.add('dragging');
+        props.draggedCard.current = e.currentTarget;
+        props.draggedCardState.current = {id: props.id, parentId: props.parentId, content: props.content};
     }
     function handleDragEnd(e){
         e.target.classList.remove('dragging');
+        
     }
     if (!editing){
         return (

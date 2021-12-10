@@ -20,32 +20,52 @@ const listSlice = createSlice({
             listAdapter.updateOne(state, { id: payload.id, changes: {cards: cardList} });
         },
         cardRemoved: (state, {payload}) => {
+            // Payload is a card object: {parentId, id}
             const list = selectById(state, payload.parentId);
             const cardList = list.cards.filter(card => card.id !== payload.id);
             
             listAdapter.updateOne(state, {id: payload.parentId, changes: {cards: cardList}});
         },
         cardUpdated: (state, {payload}) => {
+            // Payload is a card object: {id: Card's entity id, parentId: List's id, cardId?: Card nominal id, content?}
             const list = selectById(state, payload.parentId);
 
             const cardList = list.cards.map(card => {
                 let newCard = {...card};
                 if (card.id === payload.id){
-                    newCard.content = payload.content;
-                    newCard.cardId = payload.cardId;
+                    // Updates card information
+                    newCard.content = payload.content || card.content;
+                    newCard.cardId = payload.cardId || card.cardId;
                 }
                 return newCard;
             })
             listAdapter.updateOne(state, {id: payload.parentId, changes: {cards: cardList}});
+        },
+        cardMoved: (state, {payload}) => {
+            // Payload receives: {id: Card's entity id, parentId: List's id, newParentId}
+            if (payload.newParentId !== payload.parentId) {
+                console.log(payload.parentId, payload.newParentId);
+
+                const oldParent = selectById(state, payload.parentId);
+                const oldParentCards = oldParent.cards.filter(card => card.id !== payload.id);
+                let movedCard = oldParent.cards.find(card => card.id === payload.id);
+                
+                const newParent = selectById(state, payload.newParentId);
+                const newParentCards = [...newParent.cards];
+                newParentCards.push({...movedCard, parentId: payload.newParentId});
+                listAdapter.updateOne(state, {id: payload.newParentId, changes: {cards: newParentCards}});
+                listAdapter.updateOne(state, {id: payload.parentId, changes: {cards: oldParentCards}});
+            }
         }
-        }    
+        }
 })
 
 // Export reducer
 export default listSlice.reducer;
 
 // Export action creators
-export const {listAdded, listUpdated, listRemoved, cardAdded, cardRemoved, cardUpdated} = listSlice.actions;
+export const {listAdded, listUpdated, listRemoved, 
+                cardAdded, cardRemoved, cardUpdated, cardMoved} = listSlice.actions;
 
 // Export selectors
 const {selectAll, selectById} = listAdapter.getSelectors();

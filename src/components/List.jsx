@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectOne, listUpdated, listRemoved, cardAdded, cardRemoved } from '../reducers/listSlice';
+import { selectOne, listUpdated, listRemoved, cardAdded, cardMoved, cardRemoved } from '../reducers/listSlice';
 
 import EditableTopic from './EditableTopic';
 import ListItem from './ListItem';
 
 import './list.scss';
 
-export default function List({id}){
+export default function List({id, draggedCard, draggedCardState}){
     const thisList = useSelector((state) => selectOne(state, id));
     const dispatch = useDispatch();
 
@@ -44,9 +44,14 @@ export default function List({id}){
     }
     function handleDragOver(e){
         e.preventDefault();
-        //console.log(draggedCard);
-        
+        e.stopPropagation();
     }
+    function handleDrop(e){
+        e.preventDefault();
+        // Move the dragged card to this list
+        dispatch(cardMoved({parentId: draggedCardState.current.parentId, id: draggedCardState.current.id, newParentId: id}));
+    }
+
     function renderListHeader(){
         if (!editing)
             return(
@@ -105,13 +110,13 @@ export default function List({id}){
             
     }
     function renderCards(){
-        const cardsToRender = thisList.cards.map(({cardId, id, parentId, content, topics}) => <ListItem content={content} topics={topics} id={id} cardId={cardId} parentId={parentId} key={id} />)
+        const cardsToRender = thisList.cards.map(({cardId, id, parentId, content, topics}) => <ListItem content={content} topics={topics} id={id} cardId={cardId} parentId={parentId} key={id} draggedCard={draggedCard} draggedCardState={draggedCardState} />)
         return (cardsToRender);
     }
     return(
         <div className="list">
             {renderListHeader()}
-            <div className="card-list" onDragOver={handleDragOver}>
+            <div className="card-list" onDragOver={handleDragOver} onDrop={handleDrop}>
                 {renderCards()}
                 <button className="card-list__add-card" type='button' onClick={handleAddCard}>Add a new card</button>
             </div>
