@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectOne, listUpdated, listRemoved, cardAdded, cardMoved, cardRemoved } from '../reducers/listSlice';
+import { selectOne, listUpdated, listRemoved, cardAdded, cardChangedList, cardRemoved, cardUpdated } from '../reducers/listSlice';
 
 import EditableTopic from './EditableTopic';
 import ListItem from './ListItem';
 
 import './list.scss';
 
-export default function List({id, draggedCard, draggedCardState}){
+export default function List({id, draggedCardState, draggedCardElem}){
     const thisList = useSelector((state) => selectOne(state, id));
     const dispatch = useDispatch();
 
@@ -16,6 +16,8 @@ export default function List({id, draggedCard, draggedCardState}){
     const [editing, setEditing] = useState(true);
     const [listTitle, setListTitle] = useState(thisList.title);
     const [listId, setListId] = useState(thisList.listId);
+    const [displayPlaceholderCard, setDisplayPlaceholderCard] = useState(false);
+    const cardListElement = useRef();
 
     function enterEditMode(e){
         setEditing(true);
@@ -40,16 +42,22 @@ export default function List({id, draggedCard, draggedCardState}){
         dispatch(listRemoved(id));
     }
     function handleAddCard(){
-        dispatch(cardAdded({id}));
+        dispatch(cardAdded({parentId: id}));
     }
-    function handleDragOver(e){
-        e.preventDefault();
-        e.stopPropagation();
+    function handleDragEnter(e){
+        if (!thisList.cards.length)
+            setDisplayPlaceholderCard(true);
     }
-    function handleDrop(e){
+    function handlePlaceholderCardDragLeave(e){
+        setDisplayPlaceholderCard(false);
+    }
+    function handlePlaceholderCardDragOver(e){
         e.preventDefault();
-        // Move the dragged card to this list
-        dispatch(cardMoved({parentId: draggedCardState.current.parentId, id: draggedCardState.current.id, newParentId: id}));
+    }
+    function handlePlaceholderCardDrop(e){
+        dispatch(cardRemoved({id: draggedCardState.current.id, parentId: draggedCardState.current.parentId}));
+        dispatch(cardAdded({...draggedCardState.current, parentId: id}));
+        setDisplayPlaceholderCard(false);
     }
 
     function renderListHeader(){
@@ -110,15 +118,27 @@ export default function List({id, draggedCard, draggedCardState}){
             
     }
     function renderCards(){
-        const cardsToRender = thisList.cards.map(({cardId, id, parentId, content, topics}) => <ListItem content={content} topics={topics} id={id} cardId={cardId} parentId={parentId} key={id} draggedCard={draggedCard} draggedCardState={draggedCardState} />)
-        return (cardsToRender);
+        const thisListCards = [...thisList.cards];
+        const cardsToRender = thisListCards.map(({cardId, id, parentId, content, topics}, i) => <ListItem content={content} topics={topics} id={id} cardId={cardId} parentId={parentId} key={id} draggedCardState={draggedCardState} draggedCardElem={draggedCardElem} />)
+        return cardsToRender;
+    }
+    function renderPlaceholderCard(){
+        if (displayPlaceholderCard){
+            return (
+                <div className="card-list__placeholder-card" onDrop={handlePlaceholderCardDrop} onDragOver={handlePlaceholderCardDragOver} onDragLeave={handlePlaceholderCardDragLeave}></div>
+            )
+        }
+        else return null;
     }
     return(
         <div className="list">
             {renderListHeader()}
-            <div className="card-list" onDragOver={handleDragOver} onDrop={handleDrop}>
-                {renderCards()}
-                <button className="card-list__add-card" type='button' onClick={handleAddCard}>Add a new card</button>
+            <div className='list-content' onDragEnter={handleDragEnter}>
+                <div className="card-list" ref={cardListElement} >
+                    {renderCards()}
+                    {renderPlaceholderCard()}
+                </div>
+                <button className="list__add-card" type='button' onClick={handleAddCard}>Add a new card</button>
             </div>
         </div>
     )

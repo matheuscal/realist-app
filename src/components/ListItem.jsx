@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useDispatch } from 'react-redux';
-import { cardRemoved, cardUpdated } from '../reducers/listSlice';
+import { cardRemoved, cardUpdated, cardOrderChanged } from '../reducers/listSlice';
 import { Link } from 'react-router-dom';
 
 
@@ -14,6 +14,7 @@ export default function ListItem(props){
     const [editing, setEditing] = useState(false);
     const [cardId, setCardId] = useState(props.cardId);
     const [content, setContent] = useState(props.content);
+    const thisCardElem = useRef();
 
     function enterEditMode(e){
         setEditing(true);
@@ -29,8 +30,7 @@ export default function ListItem(props){
     function handleCardContentChange(e){
         setContent(e.currentTarget.value);
     }
-    function handleRemoveCard(e){
-        e.stopPropagation();
+    function removeCard(e){
         dispatch(cardRemoved({parentId: props.parentId, id: props.id}));
     }
     function handleCardSave(e){
@@ -40,22 +40,38 @@ export default function ListItem(props){
     }
     function handleDragStart(e){
         e.currentTarget.classList.add('dragging');
-        props.draggedCard.current = e.currentTarget;
-        props.draggedCardState.current = {id: props.id, parentId: props.parentId, content: props.content};
+        console.log(props.cardId);
+        props.draggedCardState.current = {id: props.id, parentId: props.parentId, cardId: props.cardId, content: props.content};
+        props.draggedCardElem.current = e.currentTarget;
     }
     function handleDragEnd(e){
         e.target.classList.remove('dragging');
         
     }
+    function handleDragOver(e){
+        e.preventDefault();
+        e.currentTarget.classList.add('card--with-border');
+    }
+    function handleDragLeave(e){
+        e.currentTarget.classList.remove('card--with-border');
+    }
+    function handleDrop(e){
+        const boundaries = e.currentTarget.getBoundingClientRect();
+        const mouseY = e.clientY;
+        const cardYCenter = boundaries.y + (boundaries.height/2);
+        dispatch(cardOrderChanged({id: props.id, parentId: props.parentId, mouseY, thisCardYCenter: cardYCenter, thisCardIndex: props.cardIndex, draggedCardState: props.draggedCardState.current}));
+        e.currentTarget.classList.remove('card--with-border');
+    }
+
     if (!editing){
         return (
-            <div className="card" onClick={enterEditMode} draggable={true} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+            <div className="card" ref={thisCardElem} onClick={enterEditMode} draggable={true} onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragOver={handleDragOver} onDrop={handleDrop} onDragLeave={handleDragLeave}>
                 <div className='card-header'>
                     <div className="card-header-id">
                     <span className="card-header-id__label">Id:</span>
                     <span className="card-header-id__value">{props.cardId}</span>
                     </div>
-                    <Link to='#' className='card-header__remove-btn display-none' onClick={handleRemoveCard} />
+                    <button type="button" className='card-header__remove-btn display-none' onClick={removeCard} />
                 </div>
                 <ul className="card-topics">
                         <li className="card-topics__item">Topic</li>
@@ -85,7 +101,7 @@ export default function ListItem(props){
             <textarea className="card-content--edit-mode" value={content} onChange={handleCardContentChange} autoFocus={true} placeholder='Card content. Example: Do the dishes'/>
             <div className="card-controls">
                 <button type='submit' className="card-controls__save-card-btn">Save card</button>
-                <button type='button' className="card-controls__remove-card-btn" onClick={handleRemoveCard}>Remove</button>
+                <button type='button' className="card-controls__remove-card-btn" onClick={removeCard}>Remove</button>
             </div>
         </form>
         <div className="edit-cover" onClick={leaveEditMode}></div>

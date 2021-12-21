@@ -1,7 +1,6 @@
 @use 'sass:map';
 @use '../utils/colors.scss' as *;
 @use '../utils/helpers.scss';
-@use '../utils/breakpoints.scss' as br;
 
 .list-controls {
     margin-top: 15px;
@@ -57,7 +56,14 @@
         width: 304px;
     }
 }
-
+.card-list {
+    &__placeholder-card {
+        width: 100%;
+        height: 55px;
+        border: 2px dashed darken(map.get($colors, "list-gray"), 10);
+        margin-bottom: 5px;
+    }
+}
 .list {
     background-color: map.get($colors, "list-gray");
     padding: 0px 9px 15px 9px;
@@ -140,6 +146,13 @@
             }
         }
     } /* .list-header */
+    &__add-card {
+        @include helpers.style-button;
+        width: 100%;
+        margin-bottom: 3px;
+        padding-left: 0; padding-right: 10px;
+        text-align: center;
+    }
 } /* .list */
 .list-topics {
     display: flex;
@@ -161,18 +174,11 @@
         }
     }
 }
-.card-list {
+.list-content {
     flex-shrink: 1;
     overflow-x: hidden;
     overflow-y: auto;
     margin-top: 12px;
     padding-right: 4px;
     @include helpers.style-scrollbar;
-    .card-list__add-card {
-        @include helpers.style-button;
-        width: 100%;
-        margin-bottom: 3px;
-        padding-left: 0; padding-right: 10px;
-        text-align: center;
-    }
 }

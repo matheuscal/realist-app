@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { listAdded, selectLists } from '../reducers/listSlice';
+import { selectLists, listAdded } from '../reducers/listSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Header from '../components/Header';
@@ -10,15 +10,15 @@ import './app.scss';
 export default function App(){
     const dispatch = useDispatch();
     const allLists = useSelector(selectLists);
-    const draggedCard = useRef(null);
     const draggedCardState = useRef(null);
+    const draggedCardElem = useRef(null);
 
     function addList(){
         dispatch(listAdded());
     }
     function renderLists(){
         const listComponents = allLists.map(({id}) => {
-            return <List id={id} key={id} draggedCard={draggedCard} draggedCardState={draggedCardState} />
+            return <List id={id} key={id} draggedCardState={draggedCardState} draggedCardElem={draggedCardElem} />
          });
         return(listComponents || null);
     }
