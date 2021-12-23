@@ -1,22 +1,35 @@
 import { createEntityAdapter, createSlice, nanoid } from "@reduxjs/toolkit";
 
-const listAdapter = createEntityAdapter();
+const listAdapter = createEntityAdapter({ sortComparer: (a,b) => a.index < b.index ? -1 : 1 });
 
 const listSlice = createSlice({
     name: 'list',
     initialState: listAdapter.getInitialState(),
     reducers: {
         listAdded: (state, action) => {
+            let newListIndex = 0;
+            const lists = selectAll(state);
+            lists.forEach((list, i) => i >= newListIndex ? newListIndex = i + 1 : null);
+
             const newId = nanoid(10);
-            listAdapter.addOne(state, {id: newId, title: "", listId: "", bgColor: "", cards: []})
+            listAdapter.addOne(state, {id: newId, title: "", listId: "", bgColor: "", cards: [], type: 'list', index: newListIndex});   
         },
         listUpdated: listAdapter.updateOne,
-        listRemoved: listAdapter.removeOne,
+        listRemoved: (state, {payload}) => {
+            let allLists = selectAll(state);
+            
+            // Adjust the new index value for all lists after removing the specified item
+            allLists = allLists.filter(list => list.id !== payload.id).map((list, i) => {
+                return {...list, index: i}
+            });
+            listAdapter.removeOne(state, payload.id);
+            listAdapter.upsertMany(state, allLists);
+        },
         cardAdded: (state, {payload}) => {
             const list = selectById(state, payload.parentId);
             const cardList = [...list.cards];
             
-            cardList.push({id: payload.id || nanoid(10), cardId: payload.cardId || "", parentId: payload.parentId, content: payload.content || ""});
+            cardList.push({id: payload.id || nanoid(10), cardId: payload.cardId || "", parentId: payload.parentId, content: payload.content || "", type: "card"});
             listAdapter.updateOne(state, { id: payload.parentId, changes: {cards: cardList} });
         },
         cardRemoved: (state, {payload}) => {
@@ -41,12 +54,14 @@ const listSlice = createSlice({
             })
             listAdapter.updateOne(state, {id: payload.parentId, changes: {cards: cardList}});
         },
-        cardOrderChanged: (state, {payload}) => {
+        cardMoved: (state, {payload}) => {
+            if (payload.draggedItemState.type !== 'card') return;
+            // Add the moved card before the card that dispatched to this reducer?
             let addBeforeThisCard = false;
             if (payload.mouseY < payload.thisCardYCenter) addBeforeThisCard = true;
             const list = selectById(state, payload.parentId);
             let newListCards = [...list.cards];
-            let draggedCard = payload.draggedCardState;
+            let draggedCard = payload.draggedItemState;
 
             // First, if the card comes from another list we delete it from there 
             if (draggedCard.parentId !== list.id) {
@@ -69,6 +84,27 @@ const listSlice = createSlice({
             newListCards.splice(addBeforeThisCard ? thisCardIndex : thisCardIndex + 1, 0, draggedCard);
  
             listAdapter.updateOne(state, {id: payload.parentId, changes: {cards: newListCards}});
+        },
+        listMoved: (state, {payload}) => {
+            console.log(payload.draggedItemState);
+            if (payload.draggedItemState.type !== 'list') return;
+            if (payload.id === payload.draggedItemState.id) return;
+            let addBeforeThisList = false;
+            if (payload.mouseX < payload.listXCenter) addBeforeThisList = true;
+            let allLists = selectAll(state);
+
+            // Remove the list that dispatched this action from it's current position
+            allLists = allLists.filter(list => list.id !== payload.draggedItemState.id);
+            
+            let thisListIndex = 0;
+            allLists.forEach((list, i) => list.id === payload.id ? thisListIndex = i : null);
+
+            allLists.splice(addBeforeThisList ? thisListIndex : thisListIndex + 1, 0, payload.draggedItemState);
+            console.log(allLists, addBeforeThisList);
+            allLists = allLists.map((list, i) => {
+                return {...list, index: i}
+            });
+            listAdapter.upsertMany(state, allLists);
         }
         }
 })
@@ -78,7 +114,7 @@ export default listSlice.reducer;
 
 // Export action creators
 export const {listAdded, listUpdated, listRemoved, 
-                cardAdded, cardRemoved, cardUpdated, cardChangedList, cardOrderChanged} = listSlice.actions;
+                cardAdded, cardRemoved, cardUpdated, cardChangedList, cardMoved, listMoved} = listSlice.actions;
 
 // Export selectors
 const {selectAll, selectById} = listAdapter.getSelectors();

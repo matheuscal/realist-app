@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useDispatch } from 'react-redux';
-import { cardRemoved, cardUpdated, cardOrderChanged } from '../reducers/listSlice';
+import { cardRemoved, cardUpdated, cardMoved } from '../reducers/listSlice';
 import { Link } from 'react-router-dom';
 
 
@@ -39,10 +39,11 @@ export default function ListItem(props){
         leaveEditMode();
     }
     function handleDragStart(e){
+        e.stopPropagation();
         e.currentTarget.classList.add('dragging');
         console.log(props.cardId);
-        props.draggedCardState.current = {id: props.id, parentId: props.parentId, cardId: props.cardId, content: props.content};
-        props.draggedCardElem.current = e.currentTarget;
+        props.draggedItemState.current = {id: props.id, parentId: props.parentId, cardId: props.cardId, content: props.content, type: props.type};
+        props.draggedItemElem.current = e.currentTarget;
     }
     function handleDragEnd(e){
         e.target.classList.remove('dragging');
@@ -50,16 +51,19 @@ export default function ListItem(props){
     }
     function handleDragOver(e){
         e.preventDefault();
-        e.currentTarget.classList.add('card--with-border');
+        e.stopPropagation();
+        if (props.draggedItemState.current.type === 'card')
+            e.currentTarget.classList.add('card--with-border');
     }
     function handleDragLeave(e){
         e.currentTarget.classList.remove('card--with-border');
     }
     function handleDrop(e){
+        e.stopPropagation();
         const boundaries = e.currentTarget.getBoundingClientRect();
         const mouseY = e.clientY;
         const cardYCenter = boundaries.y + (boundaries.height/2);
-        dispatch(cardOrderChanged({id: props.id, parentId: props.parentId, mouseY, thisCardYCenter: cardYCenter, thisCardIndex: props.cardIndex, draggedCardState: props.draggedCardState.current}));
+        dispatch(cardMoved({id: props.id, parentId: props.parentId, mouseY, thisCardYCenter: cardYCenter, thisCardIndex: props.cardIndex, draggedItemState: props.draggedItemState.current}));
         e.currentTarget.classList.remove('card--with-border');
     }
 

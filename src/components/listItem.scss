@@ -64,9 +64,6 @@
             }
         }
     }
-    &.dragging {
-        opacity: 0.5;
-    }
     &--with-border {
         outline: 3px dashed darken(map.get($colors, "list-gray"), 20);
     }

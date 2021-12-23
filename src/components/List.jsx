@@ -1,15 +1,16 @@
 import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectOne, listUpdated, listRemoved, cardAdded, cardChangedList, cardRemoved, cardUpdated } from '../reducers/listSlice';
+import { selectOne, listUpdated, listRemoved, cardAdded, cardRemoved, listMoved } from '../reducers/listSlice';
 
 import EditableTopic from './EditableTopic';
 import ListItem from './ListItem';
 
 import './list.scss';
 
-export default function List({id, draggedCardState, draggedCardElem}){
+export default function List({id, draggedItemState, draggedItemElem}){
     const thisList = useSelector((state) => selectOne(state, id));
+
     const dispatch = useDispatch();
 
     // This state is responsible for making the list enter and leave the edit mode.
@@ -17,7 +18,7 @@ export default function List({id, draggedCardState, draggedCardElem}){
     const [listTitle, setListTitle] = useState(thisList.title);
     const [listId, setListId] = useState(thisList.listId);
     const [displayPlaceholderCard, setDisplayPlaceholderCard] = useState(false);
-    const cardListElement = useRef();
+    let listWrapperElem = useRef();
 
     function enterEditMode(e){
         setEditing(true);
@@ -39,13 +40,14 @@ export default function List({id, draggedCardState, draggedCardElem}){
         leaveEditMode();
     }
     function handleListRemove(e){
-        dispatch(listRemoved(id));
+        dispatch(listRemoved({id}));
     }
     function handleAddCard(){
         dispatch(cardAdded({parentId: id}));
     }
-    function handleDragEnter(e){
-        if (!thisList.cards.length)
+    function handleListContentDragEnter(e){
+        console.log(draggedItemState);
+        if (!thisList.cards.length && draggedItemState.current.type === 'card')
             setDisplayPlaceholderCard(true);
     }
     function handlePlaceholderCardDragLeave(e){
@@ -55,15 +57,47 @@ export default function List({id, draggedCardState, draggedCardElem}){
         e.preventDefault();
     }
     function handlePlaceholderCardDrop(e){
-        dispatch(cardRemoved({id: draggedCardState.current.id, parentId: draggedCardState.current.parentId}));
-        dispatch(cardAdded({...draggedCardState.current, parentId: id}));
+        dispatch(cardRemoved({id: draggedItemState.current.id, parentId: draggedItemState.current.parentId}));
+        dispatch(cardAdded({...draggedItemState.current, parentId: id}));
         setDisplayPlaceholderCard(false);
     }
-
+    function handleHeaderDragStart(e){
+        draggedItemState.current = {...thisList};
+        listWrapperElem.current.classList.add('dragging');
+    }
+    function handleHeaderDragEnd(e){
+        listWrapperElem.current.classList.remove('dragging');
+    }
+    function handleHeaderDragLeave(e){
+        listWrapperElem.current.classList.remove('list-wrapper--with-right-border');
+        listWrapperElem.current.classList.remove('list-wrapper--with-left-border');
+    }
+    function handleHeaderDragOver(e) {
+        e.preventDefault();
+        const mouseAfterCenter = isMouseXAfterListXCenter(e);
+        if (draggedItemState.current.id !== id){
+            if (mouseAfterCenter){
+                listWrapperElem.current.classList.add('list-wrapper--with-right-border');
+                listWrapperElem.current.classList.remove('list-wrapper--with-left-border');
+            }
+            else {
+                listWrapperElem.current.classList.add('list-wrapper--with-left-border');
+                listWrapperElem.current.classList.remove('list-wrapper--with-right-border');
+            }
+        }
+    }
+    function handleHeaderDrop(e){
+        const mouseX = e.clientX;
+        const listRect = e.currentTarget.getBoundingClientRect();
+        const listXCenter = listRect.x + (listRect.width/2);
+        dispatch(listMoved({id, draggedItemState: draggedItemState.current, mouseX, listXCenter}));
+        listWrapperElem.current.classList.remove('list-wrapper--with-right-border');
+        listWrapperElem.current.classList.remove('list-wrapper--with-left-border');
+    }
     function renderListHeader(){
         if (!editing)
             return(
-            <div className="list-header-wrapper" onClick={enterEditMode}>
+            <div className="list-header-wrapper" onClick={enterEditMode} draggable={true} onDragStart={handleHeaderDragStart} onDragOver={handleHeaderDragOver} onDrop={handleHeaderDrop} onDragLeave={handleHeaderDragLeave} onDragEnd={handleHeaderDragEnd}>
             <div className="list-header">
                 <div>
                     <h2 className="list-header__title">{thisList.title}</h2>
@@ -119,7 +153,7 @@ export default function List({id, draggedCardState, draggedCardElem}){
     }
     function renderCards(){
         const thisListCards = [...thisList.cards];
-        const cardsToRender = thisListCards.map(({cardId, id, parentId, content, topics}, i) => <ListItem content={content} topics={topics} id={id} cardId={cardId} parentId={parentId} key={id} draggedCardState={draggedCardState} draggedCardElem={draggedCardElem} />)
+        const cardsToRender = thisListCards.map(({cardId, id, parentId, content, topics, type}, i) => <ListItem content={content} topics={topics} id={id} cardId={cardId} parentId={parentId} key={id} draggedItemState={draggedItemState} draggedItemElem={draggedItemElem} type={type} />)
         return cardsToRender;
     }
     function renderPlaceholderCard(){
@@ -131,15 +165,29 @@ export default function List({id, draggedCardState, draggedCardElem}){
         else return null;
     }
     return(
-        <div className="list">
+        <div className="list-wrapper" ref={listWrapperElem}>
+        <div className="list" >
             {renderListHeader()}
-            <div className='list-content' onDragEnter={handleDragEnter}>
-                <div className="card-list" ref={cardListElement} >
+            <div className='list-content' onDragEnter={handleListContentDragEnter}>
+                <div className="card-list">
                     {renderCards()}
                     {renderPlaceholderCard()}
                 </div>
                 <button className="list__add-card" type='button' onClick={handleAddCard}>Add a new card</button>
             </div>
         </div>
+        </div>
     )
+}
+
+function isMouseXAfterListXCenter(e) {
+    const mouseX = e.clientX;
+    const listRect = e.currentTarget.getBoundingClientRect();
+    const listXCenter = listRect.x + (listRect.width/2);
+    if (mouseX < listXCenter){
+        return false;
+    }
+    else {
+        return true;
+    }
 }

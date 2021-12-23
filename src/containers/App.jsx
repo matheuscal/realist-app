@@ -10,15 +10,15 @@ import './app.scss';
 export default function App(){
     const dispatch = useDispatch();
     const allLists = useSelector(selectLists);
-    const draggedCardState = useRef(null);
-    const draggedCardElem = useRef(null);
+    const draggedItemState = useRef(null);
+    const draggedItemElem = useRef(null);
 
     function addList(){
         dispatch(listAdded());
     }
     function renderLists(){
         const listComponents = allLists.map(({id}) => {
-            return <List id={id} key={id} draggedCardState={draggedCardState} draggedCardElem={draggedCardElem} />
+            return <List id={id} key={id} draggedItemState={draggedItemState} draggedItemElem={draggedItemElem} />
          });
         return(listComponents || null);
     }

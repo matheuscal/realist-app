@@ -67,7 +67,6 @@
 .list {
     background-color: map.get($colors, "list-gray");
     padding: 0px 9px 15px 9px;
-    margin-right: 7px;
     border-radius: 3px;
     width: 304px;
     max-height: 100%;
@@ -154,6 +153,16 @@
         text-align: center;
     }
 } /* .list */
+.list-wrapper {
+    margin-right: 2px;
+    padding: 0 3px 0 3px;
+    &--with-right-border {
+        border-right: 4px solid #cccccc93;
+    }
+    &--with-left-border {
+        border-left: 4px solid #cccccc93;
+    }
+}
 .list-topics {
     display: flex;
     flex-direction: row;
