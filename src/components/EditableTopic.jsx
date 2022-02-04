@@ -1,14 +1,15 @@
-import React from 'react';
-import './editableTopic.scss';
+import React, {useState} from 'react';
+import './topic.scss';
 
-export default function EditableTopic(props){
+export default function EditableTopic({value, onClick}){
+    const [displayText, setDisplayText] = useState(value);
     function handleMouseEnter(e){
-        e.target.innerText = "Remove";
+        setDisplayText(`${value} (Remove)`);
     }
     function handleMouseLeave(e){
-        e.target.innerText = "Topic";
+        setDisplayText(value);
     }
     return(
-        <li className="editable-topic" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>Topic</li>
+        <li className="editable-topic" onClick={onClick} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>{displayText}</li>
     )
 }

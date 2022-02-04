@@ -1,6 +1,7 @@
 @use 'sass:map';
 @use './colors.scss' as *;
 @use './typography.scss' as *;
+@use './helpers.scss';
 
 body, div, li {margin: 0; padding: 0; left: 0; top: 0;}
 li {list-style: none;}
@@ -36,4 +37,10 @@ button {border: none;}
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.65);
+}
+
+.add-topic-btn {
+    @include helpers.style-button;
+    padding-right: 12px;
+    display: block;
 }

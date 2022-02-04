@@ -12,7 +12,7 @@ const listSlice = createSlice({
             lists.forEach((list, i) => i >= newListIndex ? newListIndex = i + 1 : null);
 
             const newId = nanoid(10);
-            listAdapter.addOne(state, {id: newId, title: "", listId: "", bgColor: "", cards: [], type: 'list', index: newListIndex});   
+            listAdapter.addOne(state, {id: newId, title: "", listId: "", bgColorClass: "", cards: [], type: 'list', index: newListIndex});   
         },
         listUpdated: listAdapter.updateOne,
         listRemoved: (state, {payload}) => {
@@ -28,8 +28,8 @@ const listSlice = createSlice({
         cardAdded: (state, {payload}) => {
             const list = selectById(state, payload.parentId);
             const cardList = [...list.cards];
-            
-            cardList.push({id: payload.id || nanoid(10), cardId: payload.cardId || "", parentId: payload.parentId, content: payload.content || "", type: "card"});
+            cardList.push({id: payload.id || nanoid(10), cardId: payload.cardId || "", parentId: payload.parentId, content: payload.content || "", type: "card", editing: typeof payload.editing !== "null" ? payload.editing : true});
+            console.log(cardList);
             listAdapter.updateOne(state, { id: payload.parentId, changes: {cards: cardList} });
         },
         cardRemoved: (state, {payload}) => {
@@ -54,6 +54,7 @@ const listSlice = createSlice({
             })
             listAdapter.updateOne(state, {id: payload.parentId, changes: {cards: cardList}});
         },
+        // Triggered when the card changed position
         cardMoved: (state, {payload}) => {
             if (payload.draggedItemState.type !== 'card') return;
             // Add the moved card before the card that dispatched to this reducer?
@@ -62,14 +63,14 @@ const listSlice = createSlice({
             const list = selectById(state, payload.parentId);
             let newListCards = [...list.cards];
             let draggedCard = payload.draggedItemState;
-
+            
             // First, if the card comes from another list we delete it from there 
             if (draggedCard.parentId !== list.id) {
                 const oldParent = selectById(state, draggedCard.parentId);
                 let oldParentCards = [...oldParent.cards];
                 oldParentCards = oldParentCards.filter(card => card.id !== draggedCard.id);
                 listAdapter.updateOne(state, { id: draggedCard.parentId, changes: {cards: [...oldParentCards]} });
-
+                
                 draggedCard.parentId = list.id;
             }
        
@@ -82,7 +83,7 @@ const listSlice = createSlice({
 
             // Lastly insert the removed card before or after the index of the card that dispatched this action
             newListCards.splice(addBeforeThisCard ? thisCardIndex : thisCardIndex + 1, 0, draggedCard);
- 
+            console.log(newListCards);
             listAdapter.updateOne(state, {id: payload.parentId, changes: {cards: newListCards}});
         },
         listMoved: (state, {payload}) => {

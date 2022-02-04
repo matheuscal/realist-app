@@ -12,6 +12,7 @@ export default function App(){
     const allLists = useSelector(selectLists);
     const draggedItemState = useRef(null);
     const draggedItemElem = useRef(null);
+    const [bgColor, setBgColor] = useState("");
 
     function addList(){
         dispatch(listAdded());
@@ -24,8 +25,8 @@ export default function App(){
     }
     return (
         <div id='appView'>
-            <div id="bg" className='bg-black'></div>
-            <Header />
+            <div id="bg" className={bgColor} ></div>
+            <Header setBgColor={setBgColor} />
             <div id="dashboard">
                 <div className="list-container">
                     {renderLists()}

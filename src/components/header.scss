@@ -3,7 +3,6 @@
 @use '../utils/colors.scss' as *;
 
 #bgColorPicker {
-    @include helpers.style-bg-color-picker;
     margin-right: 30px;
 }
 
@@ -77,10 +76,11 @@
     }
 }
 .topics {
-    &__add-topic-btn {
-        margin-left: 5px;
-        @include helpers.style-button;
-    }
+    padding-left: 5px;
+    max-width: 250px;
+    max-height: 80px;
+    overflow-x: auto;
+    @include helpers.style-scrollbar(0.2, 0.7);
 }
 
 #logo {

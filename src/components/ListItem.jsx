@@ -1,21 +1,16 @@
 import React, { useState, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { cardRemoved, cardUpdated, cardMoved } from '../reducers/listSlice';
-import { Link } from 'react-router-dom';
-
-
-import EditableTopic from './EditableTopic';
 
 import './listItem.scss';
 
 export default function ListItem(props){
     const dispatch = useDispatch();
     // This state is responsible for making the card enter and leave the edit mode.
-    const [editing, setEditing] = useState(false);
+    const [editing, setEditing] = useState(props.editing);
     const [cardId, setCardId] = useState(props.cardId);
     const [content, setContent] = useState(props.content);
     const thisCardElem = useRef();
-
     function enterEditMode(e){
         setEditing(true);
     }
@@ -72,15 +67,11 @@ export default function ListItem(props){
             <div className="card" ref={thisCardElem} onClick={enterEditMode} draggable={true} onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragOver={handleDragOver} onDrop={handleDrop} onDragLeave={handleDragLeave}>
                 <div className='card-header'>
                     <div className="card-header-id">
-                    <span className="card-header-id__label">Id:</span>
+                    <span className="card-header-id__label">{props.cardId ? 'Alias: ' : null}</span>
                     <span className="card-header-id__value">{props.cardId}</span>
                     </div>
                     <button type="button" className='card-header__remove-btn display-none' onClick={removeCard} />
                 </div>
-                <ul className="card-topics">
-                        <li className="card-topics__item">Topic</li>
-                        <li className="card-topics__item">Topic</li>
-                </ul>
                 <div className="card-content">
                     <p>{props.content}</p>
                 </div>
@@ -92,16 +83,11 @@ export default function ListItem(props){
         <form className="card card--edit-mode" onSubmit={handleCardSave}>
             <div className='card-header'>
                 <div className="card-header-id">
-                    <label htmlFor='cardId' className="card-header-id__label--edit-mode">Id:</label>
-                    <input type='text' className="card-header-id__value--edit-mode" value={cardId} onChange={handleCardIdChange} placeholder="Unique card identifier"/>
+                    <label htmlFor='cardId' className="card-header-id__label--edit-mode">Alias:</label>
+                    <input type='text' className="card-header-id__value--edit-mode" value={cardId} onChange={handleCardIdChange} placeholder="Card alternative name (no spaces)"/>
                 </div>
                 <button className='card-header__remove-btn display-block' onClick={leaveEditMode} />
             </div>
-            <ul className="card-topics">
-                <EditableTopic />
-                <EditableTopic />
-                <button className='card-topics__add-topic' />
-            </ul>
             <textarea className="card-content--edit-mode" value={content} onChange={handleCardContentChange} autoFocus={true} placeholder='Card content. Example: Do the dishes'/>
             <div className="card-controls">
                 <button type='submit' className="card-controls__save-card-btn">Save card</button>

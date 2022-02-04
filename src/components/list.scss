@@ -32,7 +32,6 @@
         }
     }
     &__color-picker {
-        @include helpers.style-bg-color-picker;
         margin-left: auto;
         margin-right: 10px;
         &--edit-mode {
@@ -49,7 +48,7 @@
         left: -9px;
         top: auto;
         z-index: 10;
-        background-color: map.get($colors, "list-gray");
+        background-color: rgba(map.get($colors, "list-gray"), 0.7);
         padding: 0px 9px 15px 9px;
         margin-right: 7px;
         border-radius: 3px;
@@ -72,6 +71,22 @@
     max-height: 100%;
     display: flex;
     flex-direction: column;
+    &--bg-blue {
+        background-color: map.get($colors, "list-blue");
+
+    }
+    &--bg-green {
+        background-color: map.get($colors, "list-green");
+    }
+    &--bg-red {
+        background-color: map.get($colors, "list-red");
+    }
+    &--bg-black {
+        background-color: map.get($colors, "list-black");
+    }
+    &--bg-purple {
+        background-color: map.get($colors, "list-purple");
+    }
     &-header {
         display: flex;
         flex-direction: row;
@@ -131,7 +146,7 @@
         &__remove-btn {
             display: none;
             margin-left: auto;
-            color: map.get($colors, "light-gray");
+            color: map.get($colors, "gray");
             background-color: transparent;
             cursor: pointer;
             &:hover {
@@ -156,6 +171,7 @@
 .list-wrapper {
     margin-right: 2px;
     padding: 0 3px 0 3px;
+    height: 100%;
     &--with-right-border {
         border-right: 4px solid #cccccc93;
     }
@@ -168,6 +184,7 @@
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: flex-start;
+    align-items: flex-start;
     cursor: pointer;
     margin: 0;
     padding: 10px 0 0;
