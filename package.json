@@ -36,6 +36,7 @@
     "webpack-dev-server": "^4.5.0"
   },
   "devDependencies": {
+    "case-sensitive-paths-webpack-plugin": "^2.4.0",
     "css-loader": "^6.5.1",
     "sass": "^1.43.4",
     "sass-loader": "^12.3.0",

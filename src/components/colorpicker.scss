@@ -1,0 +1,33 @@
+@use "sass:map";
+@use "../utils/colors.scss" as *;
+@use "../utils/helpers.scss";
+
+.color-picker-list {
+    position: absolute;
+    top: auto;
+    left: auto;
+}
+
+.color-picker-square {
+    &--red, &--blue, &--green, &--black, &--purple {
+        opacity: 0.8;
+        &:hover {
+            opacity: 1;
+        }
+    }
+    &--red {
+        @include helpers.style-bg-color-picker("bg-red");            
+    }
+    &--blue {
+        @include helpers.style-bg-color-picker("bg-blue");
+    }
+    &--green {
+        @include helpers.style-bg-color-picker("bg-green");
+    }
+    &--black {
+        @include helpers.style-bg-color-picker("bg-black");
+    }
+    &--purple {
+        @include helpers.style-bg-color-picker("bg-purple");
+    }
+}
