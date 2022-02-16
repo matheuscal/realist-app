@@ -14,7 +14,6 @@ import './list.scss';
 export default function List({id, draggedItemState, draggedItemElem}){
     const dispatch = useDispatch();
     
-    // Make thisList be a state too?
     const thisList = useSelector((state) => selectOne(state, id));
     const allTopics = useSelector(selectTopics);
     const listTopics = useMemo(()=> {
@@ -25,7 +24,7 @@ export default function List({id, draggedItemState, draggedItemElem}){
     }, [allTopics]);
 
     // This state is responsible for making the list enter and leave the edit mode.
-    const [editing, setEditing] = useState(true);
+    const [editing, setEditing] = useState(false);
     const [listTitle, setListTitle] = useState(thisList.title);
     const [listId, setListId] = useState(thisList.listId);
     const [displayPlaceholderCard, setDisplayPlaceholderCard] = useState(false);
@@ -67,7 +66,7 @@ export default function List({id, draggedItemState, draggedItemElem}){
         dispatch(listRemoved({id}));
     }
     function handleAddCard(){
-        dispatch(cardAdded({parentId: id, editing: true}));
+        dispatch(cardAdded({parentId: id, editing: false, content: "Click to edit this card."}));
     }
     function handleListContentDragEnter(e){
         console.log(draggedItemState);

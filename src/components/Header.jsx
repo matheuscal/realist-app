@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectTopics, addOne } from '../reducers/topicSlice';
+import { selectFilters, queryUpdated, colorAdded, colorRemoved } from '../reducers/filterSlice';
 import ColorPicker from './ColorPicker';
 import Topic from './Topic'
 
@@ -15,7 +16,12 @@ export default function Header({setBgColor}){
     const [newTopicValue, setNewTopicValue] = useState("");
     const [displayColorPickerList, setDisplayColorPickerList] = useState("");
     const [colorPickerClass, setColorPickerClass] = useState("color-picker-square--black");
+    const [searchInputVal, setSearchInputVal] = useState("");
 
+    useEffect(()=> {
+        dispatch(queryUpdated(searchInputVal))
+    },[searchInputVal]);
+    
     function handleAddTopicClick(){
         setDisplayAddTopicForm(true);
         setNewTopicValue("");
@@ -33,14 +39,27 @@ export default function Header({setBgColor}){
     function handleAddTopicFormClose(e){
         setDisplayAddTopicForm(false);
     }
-    function handleColorPickeClick(){
+    function handleColorPickerClick(){
         if (displayColorPickerList) setDisplayColorPickerList(false);
         else setDisplayColorPickerList(true);
     }
     function handleColorPickerListClick(bgColorClass){
         setBgColor(bgColorClass);
     }
-
+    function handleSearchInputChange(e){
+        setSearchInputVal(e.currentTarget.value);
+    }
+    function handleColorFilterClick(e){
+        if (!e.currentTarget.classList.contains("selected"))
+        {
+            e.currentTarget.classList.add('selected');
+            dispatch(colorAdded(e.currentTarget.value));
+        }
+        else {
+            e.currentTarget.classList.remove('selected');
+            dispatch(colorRemoved(e.currentTarget.value));
+        }
+    }
     // --------------- Render Functions ---------------- //
     function renderColorPickerList(){
         if (displayColorPickerList) {
@@ -81,16 +100,16 @@ export default function Header({setBgColor}){
                 <div className="filter">
                     <div>
                         <form action="" className='filter-search'>
-                            <input className="filter-search__input" type="text" placeholder="Search names, texts, topics and aliases..."/>
+                            <input className="filter-search__input" type="text" placeholder="Search names, texts, topics and aliases..." val={searchInputVal} onChange={handleSearchInputChange}/>
                         </form>
                         <div className="filter-color">
                             <p className="filter-color__label">Color filter:</p>
                             <ul className="colors">
-                                <li className="colors__green"></li>
-                                <li className="colors__blue"></li>
-                                <li className="colors__red"></li>
-                                <li className="colors__black"></li>
-                                <li className="colors__purple"></li>
+                                <li><button className="colors__green" value="list--bg-green" onClick={handleColorFilterClick}></button></li>
+                                <li><button className="colors__blue" value="list--bg-blue" onClick={handleColorFilterClick}></button></li>
+                                <li><button className="colors__red" value="list--bg-red" onClick={handleColorFilterClick}></button></li>
+                                <li><button className="colors__black" value="list--bg-black" onClick={handleColorFilterClick}></button></li>
+                                <li><button className="colors__purple" value="list--bg-purple" onClick={handleColorFilterClick}></button></li>
                             </ul>
                         </div>
                     </div>
@@ -100,7 +119,7 @@ export default function Header({setBgColor}){
                         <button className="add-topic-btn" onClick={handleAddTopicClick}>{topics.length? null : "Create a new topic"}</button>
                     </div>
                 </div>
-                <div id='bgColorPicker' className={colorPickerClass} onClick={handleColorPickeClick}>
+                <div id='bgColorPicker' className={colorPickerClass} onClick={handleColorPickerClick}>
                     {renderColorPickerList()}
                 </div>
             </div>

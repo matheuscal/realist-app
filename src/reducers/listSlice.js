@@ -12,7 +12,7 @@ const listSlice = createSlice({
             lists.forEach((list, i) => i >= newListIndex ? newListIndex = i + 1 : null);
 
             const newId = nanoid(10);
-            listAdapter.addOne(state, {id: newId, title: "", listId: "", bgColorClass: "", cards: [], type: 'list', index: newListIndex});   
+            listAdapter.addOne(state, {id: newId, title: "Click to edit.", listId: "", bgColorClass: "list--bg-black", cards: [], type: 'list', index: newListIndex});   
         },
         listUpdated: listAdapter.updateOne,
         listRemoved: (state, {payload}) => {
