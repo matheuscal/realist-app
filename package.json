@@ -4,7 +4,8 @@
   "description": "A practical ReactJS boilerplate using webpack and React-Router.",
   "main": "main.js",
   "scripts": {
-    "start": "webpack serve --mode development",
+    "start": "node server.prod.js",
+    "dev": "webpack serve --mode development",
     "build": "webpack --mode production",
     "use-sass": "npm i --save-dev sass-loader sass",
     "use-redux": "npm i @reduxjs/toolkit react-redux"
@@ -25,6 +26,7 @@
     "@babel/preset-react": "^7.16.0",
     "@reduxjs/toolkit": "^1.6.2",
     "babel-loader": "^8.2.3",
+    "express": "^4.17.2",
     "html-webpack-plugin": "^5.5.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
