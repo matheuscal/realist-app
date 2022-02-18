@@ -47,7 +47,7 @@ const listSlice = createSlice({
                 if (card.id === payload.id){
                     // Updates card information
                     if (payload.content) newCard.content = payload.content;
-                    if (payload.cardId) newCard.cardId = payload.cardId;
+                    if (payload.cardId !== null) newCard.cardId = payload.cardId;
                     if (payload.newParentId) newCard.parentId = payload.newParentId; 
                 }
                 return newCard;

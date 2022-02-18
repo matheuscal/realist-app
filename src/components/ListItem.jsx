@@ -18,9 +18,7 @@ export default function ListItem(props){
         setEditing(false);
     }
     function handleCardIdChange(e){
-        // disallow the use of spaces for ids
-        const newCardId = e.currentTarget.value.trim();
-        setCardId(newCardId);
+        setCardId(e.currentTarget.value);
     }
     function handleCardContentChange(e){
         setContent(e.currentTarget.value);
@@ -67,7 +65,7 @@ export default function ListItem(props){
             <div className="card" ref={thisCardElem} onClick={enterEditMode} draggable={true} onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragOver={handleDragOver} onDrop={handleDrop} onDragLeave={handleDragLeave}>
                 <div className='card-header'>
                     <div className="card-header-id">
-                    <span className="card-header-id__label">{props.cardId ? 'Alias: ' : null}</span>
+                    <span className="card-header-id__label">{props.cardId ? 'Name: ' : null}</span>
                     <span className="card-header-id__value">{props.cardId}</span>
                     </div>
                     <button type="button" className='card-header__remove-btn display-none' onClick={removeCard} />
@@ -83,8 +81,8 @@ export default function ListItem(props){
         <form className="card card--edit-mode" onSubmit={handleCardSave}>
             <div className='card-header'>
                 <div className="card-header-id">
-                    <label htmlFor='cardId' className="card-header-id__label--edit-mode">Alias:</label>
-                    <input type='text' className="card-header-id__value--edit-mode" value={cardId} onChange={handleCardIdChange} placeholder="Card alternative name (no spaces)"/>
+                    <label htmlFor='cardId' className="card-header-id__label--edit-mode">Name:</label>
+                    <input type='text' className="card-header-id__value--edit-mode" value={cardId} onChange={handleCardIdChange} placeholder="Card name"/>
                 </div>
                 <button className='card-header__remove-btn display-block' onClick={leaveEditMode} />
             </div>
